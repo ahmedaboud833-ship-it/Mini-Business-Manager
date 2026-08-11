@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* المتغيرات الأساسية (الوضع الفاتح) */
+        /* المتغيرات الأساسية */
         :root {
             --primary: #4361ee;
             --primary-hover: #3a53d0;
@@ -93,6 +93,7 @@
             font-weight: 500;
             transition: var(--transition);
             gap: 15px;
+            cursor: pointer;
         }
 
         .nav-links li a:hover, .nav-links li a.active {
@@ -127,11 +128,15 @@
             margin-bottom: 30px;
         }
 
-        .menu-toggle {
+        .menu-toggle, .theme-toggle {
             cursor: pointer;
             font-size: 20px;
             color: var(--text-main);
+            transition: var(--transition);
         }
+        
+        .theme-toggle { color: var(--text-muted); }
+        .theme-toggle:hover { color: var(--primary); }
 
         .topbar-actions {
             display: flex;
@@ -139,14 +144,20 @@
             gap: 20px;
         }
 
-        .theme-toggle {
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-muted);
-            transition: var(--transition);
+        /* أقسام الصفحات (Pages Sections) */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
         }
-        
-        .theme-toggle:hover { color: var(--primary); }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Dashboard Cards */
         .cards-grid {
@@ -166,41 +177,30 @@
             justify-content: space-between;
         }
 
-        .card-info h3 {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-        }
-
-        .card-info h2 {
-            font-size: 24px;
-            color: var(--text-main);
-        }
-
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
+        .card-info h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; }
+        .card-info h2 { font-size: 24px; color: var(--text-main); }
+        .card-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        
         .icon-blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
         .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
         .icon-red { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
         .icon-yellow { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
 
-        /* Action Section */
-        .actions-section {
+        /* General Section Layout */
+        .section-header {
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+        .content-box {
             background-color: var(--card-bg);
             padding: 30px;
             border-radius: 15px;
-            text-align: center;
             box-shadow: 0 5px 14px rgba(0,0,0,0.05);
+            text-align: center;
+            color: var(--text-muted);
         }
 
+        /* Buttons */
         .btn {
             background-color: var(--primary);
             color: white;
@@ -215,62 +215,26 @@
             align-items: center;
             gap: 10px;
         }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-        }
-
-        /* Loader */
+        /* Loader & Toasts (كما هي بدون تغيير) */
         .loader-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
-            transition: var(--transition);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 1000; visibility: hidden; opacity: 0; transition: var(--transition);
         }
         .loader-overlay.active { visibility: visible; opacity: 1; }
         .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 40px; height: 40px;
-            animation: spin 1s linear infinite;
+            border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%;
+            width: 40px; height: 40px; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .toast {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-right: 4px solid var(--primary);
-            animation: slideIn 0.3s ease forwards;
-        }
-        .toast.success { border-right-color: var(--success); }
-        .toast.error { border-right-color: var(--danger); }
+        #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background-color: var(--card-bg); color: var(--text-main); padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; border-right: 4px solid var(--primary); animation: slideIn 0.3s ease forwards; }
+        .toast.success { border-right-color: var(--success); } .toast.error { border-right-color: var(--danger); }
         @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
             .sidebar { transform: translateX(100%); }
             .sidebar.active { transform: translateX(0); }
@@ -280,19 +244,19 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (تم إضافة data-target لكل رابط) -->
     <aside class="sidebar" id="sidebar">
         <div class="logo">
             <i class="fa-solid fa-store"></i> MiniBM
         </div>
         <ul class="nav-links">
-            <li><a href="#" class="active"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</a></li>
-            <li><a href="#"><i class="fa-solid fa-users"></i> العملاء</a></li>
-            <li><a href="#"><i class="fa-solid fa-box"></i> المنتجات</a></li>
-            <li><a href="#"><i class="fa-solid fa-cart-shopping"></i> المبيعات</a></li>
-            <li><a href="#"><i class="fa-solid fa-wallet"></i> المصروفات</a></li>
-            <li><a href="#"><i class="fa-solid fa-file-invoice"></i> التقارير</a></li>
-            <li><a href="#"><i class="fa-solid fa-gear"></i> الإعدادات</a></li>
+            <li><a class="active" data-target="dashboard-section"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</a></li>
+            <li><a data-target="customers-section"><i class="fa-solid fa-users"></i> العملاء</a></li>
+            <li><a data-target="products-section"><i class="fa-solid fa-box"></i> المنتجات</a></li>
+            <li><a data-target="sales-section"><i class="fa-solid fa-cart-shopping"></i> المبيعات</a></li>
+            <li><a data-target="expenses-section"><i class="fa-solid fa-wallet"></i> المصروفات</a></li>
+            <li><a data-target="reports-section"><i class="fa-solid fa-file-invoice"></i> التقارير</a></li>
+            <li><a data-target="settings-section"><i class="fa-solid fa-gear"></i> الإعدادات</a></li>
         </ul>
     </aside>
 
@@ -312,68 +276,138 @@
             </div>
         </header>
 
-        <!-- Dashboard Widgets -->
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-info">
-                    <h3>إجمالي المبيعات</h3>
-                    <h2>0 ج.م</h2>
-                </div>
-                <div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div>
-            </div>
-            <div class="card">
-                <div class="card-info">
-                    <h3>عدد العملاء</h3>
-                    <h2>0</h2>
-                </div>
-                <div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div>
-            </div>
-            <div class="card">
-                <div class="card-info">
-                    <h3>المصروفات</h3>
-                    <h2>0 ج.م</h2>
-                </div>
-                <div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div>
-            </div>
-            <div class="card">
-                <div class="card-info">
-                    <h3>المنتجات</h3>
-                    <h2>0</h2>
-                </div>
-                <div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div>
-            </div>
-        </div>
+        <!-- ======================= -->
+        <!-- بداية أقسام النظام المختلفة -->
+        <!-- ======================= -->
 
-        <!-- API Testing Section -->
-        <div class="actions-section">
-            <h2 style="margin-bottom: 15px;">اختبار الاتصال بقاعدة البيانات (Google Sheets)</h2>
-            <p style="color: var(--text-muted); margin-bottom: 25px;">انقر على الزر بالأسفل لاختبار إرسال طلب إلى Google Apps Script الخاص بك.</p>
-            <button class="btn" onclick="testAPIConnection()">
-                <i class="fa-solid fa-plug"></i> اختبار الاتصال الآن
-            </button>
-            
-            <div id="apiResult" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-family: monospace; text-align: left; direction: ltr; display: none;">
-                <!-- ستظهر نتيجة الـ API هنا -->
+        <!-- 1. لوحة التحكم (القسم الافتراضي) -->
+        <section id="dashboard-section" class="page-section active">
+            <div class="section-header"><h2>نظرة عامة</h2></div>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-info"><h3>إجمالي المبيعات</h3><h2>0 ج.م</h2></div>
+                    <div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div>
+                </div>
+                <div class="card">
+                    <div class="card-info"><h3>عدد العملاء</h3><h2>0</h2></div>
+                    <div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div>
+                </div>
+                <div class="card">
+                    <div class="card-info"><h3>المصروفات</h3><h2>0 ج.م</h2></div>
+                    <div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                </div>
+                <div class="card">
+                    <div class="card-info"><h3>المنتجات</h3><h2>0</h2></div>
+                    <div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div>
+                </div>
             </div>
-        </div>
+
+            <!-- زر الاختبار -->
+            <div class="content-box">
+                <h2 style="margin-bottom: 15px; color: var(--text-main);">اختبار الاتصال بقاعدة البيانات</h2>
+                <p style="margin-bottom: 25px;">انقر على الزر بالأسفل لاختبار إرسال طلب إلى Google Apps Script.</p>
+                <button class="btn" onclick="testAPIConnection()"><i class="fa-solid fa-plug"></i> اختبار الاتصال الآن</button>
+                <div id="apiResult" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-family: monospace; text-align: left; direction: ltr; display: none;"></div>
+            </div>
+        </section>
+
+        <!-- 2. قسم العملاء -->
+        <section id="customers-section" class="page-section">
+            <div class="section-header"><h2>إدارة العملاء</h2></div>
+            <div class="content-box">
+                <i class="fa-solid fa-users" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <h3>جاري تجهيز قسم العملاء</h3>
+                <p>هنا سيظهر جدول العملاء مع أزرار لإضافة وتعديل وحذف بيانات العملاء.</p>
+            </div>
+        </section>
+
+        <!-- 3. قسم المنتجات -->
+        <section id="products-section" class="page-section">
+            <div class="section-header"><h2>إدارة المنتجات والمخزون</h2></div>
+            <div class="content-box">
+                <i class="fa-solid fa-box-open" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <h3>جاري تجهيز قسم المنتجات</h3>
+                <p>هنا سيظهر المخزون وأسعار البيع والشراء الخاص بكل منتج.</p>
+            </div>
+        </section>
+
+        <!-- 4. قسم المبيعات -->
+        <section id="sales-section" class="page-section">
+            <div class="section-header"><h2>إدارة المبيعات</h2></div>
+            <div class="content-box">
+                <i class="fa-solid fa-cart-shopping" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <h3>جاري تجهيز قسم المبيعات</h3>
+                <p>هنا سيمكنك إنشاء فواتير جديدة وتسجيل عمليات البيع.</p>
+            </div>
+        </section>
+
+        <!-- 5. قسم المصروفات -->
+        <section id="expenses-section" class="page-section">
+            <div class="section-header"><h2>إدارة المصروفات</h2></div>
+            <div class="content-box">
+                <i class="fa-solid fa-wallet" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <h3>جاري تجهيز قسم المصروفات</h3>
+                <p>هنا ستتمكن من تسجيل المصروفات اليومية والشهرية للنظام.</p>
+            </div>
+        </section>
+
+        <!-- 6. قسم التقارير -->
+        <section id="reports-section" class="page-section">
+            <div class="section-header"><h2>التقارير والإحصائيات</h2></div>
+            <div class="content-box">
+                <i class="fa-solid fa-chart-pie" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <h3>جاري تجهيز قسم التقارير</h3>
+                <p>هنا ستتمكن من استخراج تقارير الأرباح والمبيعات وتصديرها.</p>
+            </div>
+        </section>
+
+        <!-- 7. قسم الإعدادات -->
+        <section id="settings-section" class="page-section">
+            <div class="section-header"><h2>إعدادات النظام</h2></div>
+            <div class="content-box">
+                <i class="fa-solid fa-gears" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <h3>جاري تجهيز قسم الإعدادات</h3>
+                <p>هنا سيمكنك التحكم في اسم متجرك والشعار والعملة المستخدمة.</p>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Loader -->
-    <div class="loader-overlay" id="loader">
-        <div class="spinner"></div>
-    </div>
-
-    <!-- Toasts -->
+    <!-- Loader & Toasts -->
+    <div class="loader-overlay" id="loader"><div class="spinner"></div></div>
     <div id="toast-container"></div>
 
     <script>
-        // --- 1. إعدادات الواجهة (Theme & Sidebar) ---
+        // --- 1. إعدادات التنقل بين الأقسام (Navigation Logic) ---
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const pageSections = document.querySelectorAll('.page-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                // إزالة اللون من كل الروابط وإخفاء كل الأقسام
+                navLinks.forEach(item => item.classList.remove('active'));
+                pageSections.forEach(section => section.classList.remove('active'));
+
+                // إضافة اللون للرابط الذي تم الضغط عليه
+                this.classList.add('active');
+
+                // جلب اسم القسم المستهدف وإظهاره
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+
+                // إغلاق القائمة الجانبية في الموبايل بعد الضغط
+                if(window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // --- 2. إعدادات الواجهة (Theme & Sidebar Toggle) ---
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const menuToggle = document.getElementById('menuToggle');
         const themeToggle = document.getElementById('themeToggle');
         
-        // فتح وإغلاق القائمة الجانبية
         menuToggle.addEventListener('click', () => {
             if(window.innerWidth <= 768) {
                 sidebar.classList.toggle('active');
@@ -383,7 +417,6 @@
             }
         });
 
-        // الوضع الليلي
         let isDarkMode = localStorage.getItem('theme') === 'dark';
         if (isDarkMode) applyDarkTheme();
 
@@ -404,7 +437,7 @@
             themeToggle.classList.replace('fa-moon', 'fa-sun');
         }
 
-        // --- 2. دوال المساعدة (Loader & Toast) ---
+        // --- 3. دوال المساعدة (Loader & Toast) ---
         function showLoader() { document.getElementById('loader').classList.add('active'); }
         function hideLoader() { document.getElementById('loader').classList.remove('active'); }
 
@@ -412,43 +445,32 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            
             const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-            
             container.appendChild(toast);
-            
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // --- 3. الاتصال بـ Google Apps Script API ---
-        // الرابط الخاص بك
+        // --- 4. الاتصال بـ Google Apps Script API ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
 
         async function testAPIConnection() {
             showLoader();
             const resultDiv = document.getElementById('apiResult');
-            
             try {
-                // إرسال طلب GET للاختبار
                 const response = await fetch(`${SCRIPT_URL}?action=test`);
-                
-                // إذا لم يكن الـ Apps script مهيأ بدالة doGet، سيحدث خطأ CORS هنا
                 if (!response.ok) throw new Error('فشل الاتصال بالخادم');
-                
                 const data = await response.json();
-                
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = JSON.stringify(data, null, 2);
                 showToast("تم الاتصال بنجاح!", "success");
-
             } catch (error) {
                 console.error("API Error:", error);
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<span style="color: var(--danger);">حدث خطأ! تأكد من إضافة دالة doGet في ملف Apps Script ونشره كـ Web App بصلاحية Anyone.</span>`;
+                resultDiv.innerHTML = `<span style="color: var(--danger);">حدث خطأ! تأكد من إضافة دالة doGet...</span>`;
                 showToast("حدث خطأ في الاتصال", "error");
             } finally {
                 hideLoader();
