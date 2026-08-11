@@ -115,9 +115,7 @@
             <li><a class="active" data-target="dashboard-section"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</a></li>
             <li><a data-target="customers-section"><i class="fa-solid fa-users"></i> العملاء</a></li>
             <li><a data-target="products-section"><i class="fa-solid fa-box"></i> المنتجات</a></li>
-            <li><a data-target="sales-section"><i class="fa-solid fa-cart-shopping"></i> المبيعات</a></li>
             <li><a data-target="expenses-section"><i class="fa-solid fa-wallet"></i> المصروفات</a></li>
-            <li><a data-target="reports-section"><i class="fa-solid fa-file-invoice"></i> التقارير</a></li>
             <li><a data-target="settings-section"><i class="fa-solid fa-gear"></i> الإعدادات</a></li>
         </ul>
     </aside>
@@ -138,7 +136,6 @@
         <section id="dashboard-section" class="page-section active">
             <div class="section-header"><h2>نظرة عامة</h2></div>
             <div class="cards-grid">
-                <div class="card"><div class="card-info"><h3>إجمالي المبيعات</h3><h2 id="dashTotalSales">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div></div>
                 <div class="card"><div class="card-info"><h3>عدد العملاء</h3><h2 id="dashCustCount">0</h2></div><div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div></div>
                 <div class="card"><div class="card-info"><h3>المصروفات</h3><h2 id="dashTotalExpenses">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div></div>
                 <div class="card"><div class="card-info"><h3>المنتجات</h3><h2 id="dashProdCount">0</h2></div><div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div></div>
@@ -198,33 +195,7 @@
             </div>
         </section>
 
-        <!-- 4. المبيعات -->
-        <section id="sales-section" class="page-section">
-            <div class="section-header">
-                <h2>إدارة المبيعات والفواتير</h2>
-                <button class="btn" onclick="openModal('saleModal')"><i class="fa-solid fa-cart-plus"></i> تسجيل عملية بيع</button>
-            </div>
-            <div class="content-box">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>رقم الفاتورة</th>
-                                <th>العميل</th>
-                                <th>التاريخ</th>
-                                <th>الإجمالي</th>
-                                <th>طريقة الدفع</th>
-                            </tr>
-                        </thead>
-                        <tbody id="salesTableBody">
-                            <tr><td colspan="5" style="text-align: center;">جاري التحميل...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5. المصروفات -->
+        <!-- 4. المصروفات -->
         <section id="expenses-section" class="page-section">
             <div class="section-header">
                 <h2>إدارة المصروفات</h2>
@@ -250,17 +221,7 @@
             </div>
         </section>
 
-        <!-- 6. التقارير -->
-        <section id="reports-section" class="page-section">
-            <div class="section-header"><h2>التقارير والإحصائيات المالية</h2></div>
-            <div class="cards-grid">
-                <div class="card"><div class="card-info"><h3>صافي الأرباح (تقديري)</h3><h2 id="reportNetProfit">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-blue"><i class="fa-solid fa-chart-line"></i></div></div>
-                <div class="card"><div class="card-info"><h3>إجمالي الإيرادات</h3><h2 id="reportTotalRevenue">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-green"><i class="fa-solid fa-arrow-trend-up"></i></div></div>
-                <div class="card"><div class="card-info"><h3>إجمالي المصروفات</h3><h2 id="reportTotalExpenses">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-red"><i class="fa-solid> fa-arrow-trend-down"></i></div></div>
-            </div>
-        </section>
-
-        <!-- 7. الإعدادات -->
+        <!-- 5. الإعدادات -->
         <section id="settings-section" class="page-section">
             <div class="section-header"><h2>إعدادات النظام والنشاط التجاري</h2></div>
             <div class="content-box" style="max-width: 600px;">
@@ -307,24 +268,6 @@
         </div>
     </div>
 
-    <!-- Modal: مبيعات -->
-    <div class="modal-overlay" id="saleModal">
-        <div class="modal-content">
-            <div class="modal-header"><h3>تسجيل عملية بيع جديدة</h3><i class="fa-solid fa-xmark close-modal" onclick="closeModal('saleModal')"></i></div>
-            <form id="saleForm" onsubmit="handleSaleSubmit(event)">
-                <div class="form-group"><label>اختر العميل *</label><select id="saleCustomerSelect" required><option value="">اختر العميل...</option></select></div>
-                <div class="form-group"><label>اختر المنتج *</label><select id="saleProductSelect" required onchange="updateSalePrice()"><option value="">اختر المنتج...</option></select></div>
-                <div class="form-group" style="display: flex; gap: 10px;">
-                    <div style="flex: 1;"><label>الكمية *</label><input type="number" id="saleQuantity" value="1" min="1" required></div>
-                    <div style="flex: 1;"><label>السعر للقطعة</label><input type="number" step="0.01" id="salePrice" required></div>
-                </div>
-                <div class="form-group"><label>الخصم</label><input type="number" step="0.01" id="saleDiscount" value="0"></div>
-                <div class="form-group"><label>طريقة الدفع</label><select id="salePaymentMethod"><option value="نقدي">نقدي</option><option value="بطاقة">بطاقة</option><option value="تحويل">تحويل</option></select></div>
-                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">حفظ وتحديث المخزون</button>
-            </form>
-        </div>
-    </div>
-
     <!-- Modal: مصروف -->
     <div class="modal-overlay" id="expenseModal">
         <div class="modal-content">
@@ -343,8 +286,6 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
-        let globalProducts = [];
-        let globalCustomers = [];
         let globalSettings = { storeName: "MiniBM", currency: "ج.م" };
 
         const navLinks = document.querySelectorAll('.nav-links a');
@@ -360,9 +301,7 @@
                 
                 if(targetId === 'customers-section') loadCustomers();
                 if(targetId === 'products-section') loadProducts();
-                if(targetId === 'sales-section') loadSales();
                 if(targetId === 'expenses-section') loadExpenses();
-                if(targetId === 'reports-section') loadReports();
                 if(targetId === 'settings-section') loadSettingsUI();
 
                 if(window.innerWidth <= 768) sidebar.classList.remove('active');
@@ -396,16 +335,14 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        function openModal(id) { 
-            document.getElementById(id).classList.add('active'); 
-            if(id === 'saleModal') loadDropdownsForSale();
-        }
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
         async function initApp() {
             await loadSettings();
             loadCustomers();
             loadProducts();
+            loadExpenses();
         }
 
         async function loadSettings() {
@@ -424,13 +361,13 @@
         async function loadCustomers() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getCustomers`);
-                globalCustomers = await res.json();
+                const data = await res.json();
                 const tbody = document.getElementById('customersTableBody');
                 tbody.innerHTML = '';
-                if(!Array.isArray(globalCustomers) || globalCustomers.length === 0) {
+                if(!Array.isArray(data) || data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا يوجد عملاء مضافون بعد</td></tr>`;
                 } else {
-                    globalCustomers.forEach(c => {
+                    data.forEach(c => {
                         tbody.innerHTML += `<tr>
                             <td><code>${c.CustomerID}</code></td>
                             <td>${c.Name}</td>
@@ -440,7 +377,7 @@
                         </tr>`;
                     });
                 }
-                document.getElementById('dashCustCount').innerText = globalCustomers.length;
+                document.getElementById('dashCustCount').innerText = data.length;
             } catch (err) {
                 showToast("فشل تحميل العملاء", "error");
             }
@@ -449,15 +386,13 @@
         async function handleCustomerSubmit(e) {
             e.preventDefault();
             showLoader();
-            const payload = {
-                action: "addCustomer",
-                name: document.getElementById('custName').value,
-                phone: document.getElementById('custPhone').value,
-                email: document.getElementById('custEmail').value,
-                address: document.getElementById('custAddress').value
-            };
+            const name = encodeURIComponent(document.getElementById('custName').value);
+            const phone = encodeURIComponent(document.getElementById('custPhone').value);
+            const email = encodeURIComponent(document.getElementById('custEmail').value);
+            const address = encodeURIComponent(document.getElementById('custAddress').value);
+
             try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(`${SCRIPT_URL}?action=addCustomer&name=${name}&phone=${phone}&email=${email}&address=${address}`);
                 const result = await res.json();
                 if(result.status === 'success') {
                     showToast(result.message, 'success');
@@ -472,13 +407,13 @@
         async function loadProducts() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getProducts`);
-                globalProducts = await res.json();
+                const data = await res.json();
                 const tbody = document.getElementById('productsTableBody');
                 tbody.innerHTML = '';
-                if(!Array.isArray(globalProducts) || globalProducts.length === 0) {
+                if(!Array.isArray(data) || data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد منتجات مضافة بعد</td></tr>`;
                 } else {
-                    globalProducts.forEach(p => {
+                    data.forEach(p => {
                         tbody.innerHTML += `<tr>
                             <td><code>${p.ProductID}</code></td>
                             <td>${p.Name}</td>
@@ -489,7 +424,7 @@
                         </tr>`;
                     });
                 }
-                document.getElementById('dashProdCount').innerText = globalProducts.length;
+                document.getElementById('dashProdCount').innerText = data.length;
             } catch (err) {
                 showToast("فشل تحميل المنتجات", "error");
             }
@@ -498,17 +433,15 @@
         async function handleProductSubmit(e) {
             e.preventDefault();
             showLoader();
-            const payload = {
-                action: "addProduct",
-                name: document.getElementById('prodName').value,
-                category: document.getElementById('prodCategory').value,
-                purchasePrice: parseFloat(document.getElementById('prodPurchasePrice').value),
-                salePrice: parseFloat(document.getElementById('prodSalePrice').value),
-                quantity: parseInt(document.getElementById('prodQuantity').value),
-                minStock: parseInt(document.getElementById('prodMinStock').value)
-            };
+            const name = encodeURIComponent(document.getElementById('prodName').value);
+            const category = encodeURIComponent(document.getElementById('prodCategory').value);
+            const purchasePrice = document.getElementById('prodPurchasePrice').value;
+            const salePrice = document.getElementById('prodSalePrice').value;
+            const quantity = document.getElementById('prodQuantity').value;
+            const minStock = document.getElementById('prodMinStock').value;
+
             try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(`${SCRIPT_URL}?action=addProduct&name=${name}&category=${category}&purchasePrice=${purchasePrice}&salePrice=${salePrice}&quantity=${quantity}&minStock=${minStock}`);
                 const result = await res.json();
                 if(result.status === 'success') {
                     showToast(result.message, 'success');
@@ -520,85 +453,7 @@
             } finally { hideLoader(); }
         }
 
-        async function loadSales() {
-            showLoader();
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getSales`);
-                const data = await res.json();
-                const tbody = document.getElementById('salesTableBody');
-                tbody.innerHTML = '';
-                let totalSalesSum = 0;
-                if(!Array.isArray(data) || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا توجد مبيعات مسجلة بعد</td></tr>`;
-                } else {
-                    data.forEach(s => {
-                        totalSalesSum += Number(s.Total) || 0;
-                        tbody.innerHTML += `<tr>
-                            <td><code>${s.SaleID}</code></td>
-                            <td>${s.CustomerID}</td>
-                            <td>${new Date(s.Date).toLocaleDateString('ar-EG')}</td>
-                            <td style="color: var(--success); font-weight: bold;">${s.Total} ${globalSettings.currency}</td>
-                            <td>${s.PaymentMethod}</td>
-                        </tr>`;
-                    });
-                }
-                document.getElementById('dashTotalSales').innerHTML = `${totalSalesSum} <span class="currency-label">${globalSettings.currency}</span>`;
-            } catch(e) {
-                showToast("فشل تحميل المبيعات", "error");
-            } finally { hideLoader(); }
-        }
-
-        function loadDropdownsForSale() {
-            const custSelect = document.getElementById('saleCustomerSelect');
-            custSelect.innerHTML = '<option value="">اختر العميل...</option>';
-            globalCustomers.forEach(c => {
-                custSelect.innerHTML += `<option value="${c.CustomerID}">${c.Name} (${c.Phone})</option>`;
-            });
-
-            const prodSelect = document.getElementById('saleProductSelect');
-            prodSelect.innerHTML = '<option value="">اختر المنتج...</option>';
-            globalProducts.forEach(p => {
-                prodSelect.innerHTML += `<option value="${p.ProductID}" data-price="${p.SalePrice}">${p.Name} (المخزون: ${p.Quantity})</option>`;
-            });
-        }
-
-        function updateSalePrice() {
-            const prodSelect = document.getElementById('saleProductSelect');
-            const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
-            const price = selectedOpt.getAttribute('data-price') || 0;
-            document.getElementById('salePrice').value = price;
-        }
-
-        async function handleSaleSubmit(e) {
-            e.preventDefault();
-            showLoader();
-            const payload = {
-                action: "createSale",
-                customerID: document.getElementById('saleCustomerSelect').value,
-                paymentMethod: document.getElementById('salePaymentMethod').value,
-                discount: parseFloat(document.getElementById('saleDiscount').value) || 0,
-                items: [{
-                    productID: document.getElementById('saleProductSelect').value,
-                    quantity: parseInt(document.getElementById('saleQuantity').value),
-                    price: parseFloat(document.getElementById('salePrice').value)
-                }]
-            };
-            try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await res.json();
-                if(result.status === 'success') {
-                    showToast(result.message, 'success');
-                    closeModal('saleModal');
-                    loadSales();
-                    loadProducts();
-                } else { throw new Error(result.message); }
-            } catch(err) {
-                showToast("حدث خطأ أثناء إتمام البيع", "error");
-            } finally { hideLoader(); }
-        }
-
         async function loadExpenses() {
-            showLoader();
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getExpenses`);
                 const data = await res.json();
@@ -620,22 +475,18 @@
                     });
                 }
                 document.getElementById('dashTotalExpenses').innerHTML = `${totalExp} <span class="currency-label">${globalSettings.currency}</span>`;
-            } catch(e) {
-                showToast("فشل تحميل المصروفات", "error");
-            } finally { hideLoader(); }
+            } catch(e) {}
         }
 
         async function handleExpenseSubmit(e) {
             e.preventDefault();
             showLoader();
-            const payload = {
-                action: "addExpense",
-                type: document.getElementById('expType').value,
-                amount: parseFloat(document.getElementById('expAmount').value),
-                description: document.getElementById('expDescription').value
-            };
+            const type = encodeURIComponent(document.getElementById('expType').value);
+            const amount = document.getElementById('expAmount').value;
+            const description = encodeURIComponent(document.getElementById('expDescription').value);
+
             try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(`${SCRIPT_URL}?action=addExpense&type=${type}&amount=${amount}&description=${description}`);
                 const result = await res.json();
                 if(result.status === 'success') {
                     showToast(result.message, 'success');
@@ -647,29 +498,6 @@
             } finally { hideLoader(); }
         }
 
-        async function loadReports() {
-            // جلب البيانات لعرض ملخص الأرباح
-            try {
-                const salesRes = await fetch(`${SCRIPT_URL}?action=getSales`);
-                const salesData = await salesRes.json();
-                let totalRev = 0;
-                if(Array.isArray(salesData)) {
-                    salesData.forEach(s => totalRev += Number(s.Total) || 0);
-                }
-
-                const expRes = await fetch(`${SCRIPT_URL}?action=getExpenses`);
-                const expData = await expRes.json();
-                let totalExp = 0;
-                if(Array.isArray(expData)) {
-                    expData.forEach(e => totalExp += Number(e.Amount) || 0);
-                }
-
-                document.getElementById('reportTotalRevenue').innerHTML = `${totalRev} <span class="currency-label">${globalSettings.currency}</span>`;
-                document.getElementById('reportTotalExpenses').innerHTML = `${totalExp} <span class="currency-label">${globalSettings.currency}</span>`;
-                document.getElementById('reportNetProfit').innerHTML = `${totalRev - totalExp} <span class="currency-label">${globalSettings.currency}</span>`;
-            } catch(e) {}
-        }
-
         function loadSettingsUI() {
             document.getElementById('settingStoreName').value = globalSettings.storeName;
             document.getElementById('settingCurrency').value = globalSettings.currency;
@@ -678,16 +506,16 @@
         async function handleSettingsSubmit(e) {
             e.preventDefault();
             showLoader();
-            const newName = document.getElementById('settingStoreName').value;
-            const newCurr = document.getElementById('settingCurrency').value;
+            const newName = encodeURIComponent(document.getElementById('settingStoreName').value);
+            const newCurr = encodeURIComponent(document.getElementById('settingCurrency').value);
             try {
-                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "saveSetting", key: "storeName", value: newName }) });
-                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "saveSetting", key: "currency", value: newCurr }) });
+                await fetch(`${SCRIPT_URL}?action=saveSetting&key=storeName&value=${newName}`);
+                await fetch(`${SCRIPT_URL}?action=saveSetting&key=currency&value=${newCurr}`);
                 
-                globalSettings.storeName = newName;
-                globalSettings.currency = newCurr;
-                document.getElementById('storeBrandName').innerText = newName;
-                document.querySelectorAll('.currency-label').forEach(el => el.innerText = newCurr);
+                globalSettings.storeName = decodeURIComponent(newName);
+                globalSettings.currency = decodeURIComponent(newCurr);
+                document.getElementById('storeBrandName').innerText = globalSettings.storeName;
+                document.querySelectorAll('.currency-label').forEach(el => el.innerText = globalSettings.currency);
                 
                 showToast("تم حفظ إعدادات المتجر بنجاح", "success");
             } catch(e) {
@@ -695,7 +523,6 @@
             } finally { hideLoader(); }
         }
 
-        // التهيئة الأولية للموقع عند الفتح
         initApp();
     </script>
 </body>
