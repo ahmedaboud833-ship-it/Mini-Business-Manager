@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Business Manager</title>
+    <!-- خطوط جوجل (Tajawal) -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* المتغيرات الأساسية (الوضع الفاتح) */
+        :root {
+            --primary: #4361ee;
+            --primary-hover: #3a53d0;
+            --bg-color: #f4f7fe;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #2b3674;
+            --text-muted: #a3aed1;
+            --border-color: #e0e5f2;
+            --success: #05cd99;
+            --danger: #ee5d50;
+            --warning: #ffce20;
+            --transition: all 0.3s ease;
+        }
+
+        /* الوضع الليلي */
+        [data-theme="dark"] {
+            --bg-color: #0b1437;
+            --sidebar-bg: #111c44;
+            --card-bg: #111c44;
+            --text-main: #ffffff;
+            --text-muted: #8f9bba;
+            --border-color: #2b3674;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .sidebar.closed {
+            transform: translateX(100%);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            gap: 15px;
+        }
+
+        .nav-links li a:hover, .nav-links li a.active {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+            border-right: 4px solid var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-right: 260px;
+            padding: 20px;
+            transition: var(--transition);
+            width: calc(100% - 260px);
+        }
+
+        .main-content.expanded {
+            margin-right: 0;
+            width: 100%;
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .menu-toggle {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-main);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover { color: var(--primary); }
+
+        /* Dashboard Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-info h3 {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .card-info h2 {
+            font-size: 24px;
+            color: var(--text-main);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .icon-blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
+        .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
+        .icon-red { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
+        .icon-yellow { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
+
+        /* Action Section */
+        .actions-section {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Loader */
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .loader-overlay.active { visibility: visible; opacity: 1; }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-right: 4px solid var(--primary);
+            animation: slideIn 0.3s ease forwards;
+        }
+        .toast.success { border-right-color: var(--success); }
+        .toast.error { border-right-color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-right: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-store"></i> MiniBM
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</a></li>
+            <li><a href="#"><i class="fa-solid fa-users"></i> العملاء</a></li>
+            <li><a href="#"><i class="fa-solid fa-box"></i> المنتجات</a></li>
+            <li><a href="#"><i class="fa-solid fa-cart-shopping"></i> المبيعات</a></li>
+            <li><a href="#"><i class="fa-solid fa-wallet"></i> المصروفات</a></li>
+            <li><a href="#"><i class="fa-solid fa-file-invoice"></i> التقارير</a></li>
+            <li><a href="#"><i class="fa-solid fa-gear"></i> الإعدادات</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+            <div class="topbar-actions">
+                <i class="fa-solid fa-moon theme-toggle" id="themeToggle"></i>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=4361ee&color=fff" alt="User" style="width: 35px; border-radius: 50%;">
+                    <span style="font-weight: 500;">المدير</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Widgets -->
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-info">
+                    <h3>إجمالي المبيعات</h3>
+                    <h2>0 ج.م</h2>
+                </div>
+                <div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div>
+            </div>
+            <div class="card">
+                <div class="card-info">
+                    <h3>عدد العملاء</h3>
+                    <h2>0</h2>
+                </div>
+                <div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="card">
+                <div class="card-info">
+                    <h3>المصروفات</h3>
+                    <h2>0 ج.م</h2>
+                </div>
+                <div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div>
+            </div>
+            <div class="card">
+                <div class="card-info">
+                    <h3>المنتجات</h3>
+                    <h2>0</h2>
+                </div>
+                <div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div>
+            </div>
+        </div>
+
+        <!-- API Testing Section -->
+        <div class="actions-section">
+            <h2 style="margin-bottom: 15px;">اختبار الاتصال بقاعدة البيانات (Google Sheets)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">انقر على الزر بالأسفل لاختبار إرسال طلب إلى Google Apps Script الخاص بك.</p>
+            <button class="btn" onclick="testAPIConnection()">
+                <i class="fa-solid fa-plug"></i> اختبار الاتصال الآن
+            </button>
+            
+            <div id="apiResult" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-family: monospace; text-align: left; direction: ltr; display: none;">
+                <!-- ستظهر نتيجة الـ API هنا -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toast-container"></div>
+
+    <script>
+        // --- 1. إعدادات الواجهة (Theme & Sidebar) ---
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const menuToggle = document.getElementById('menuToggle');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // فتح وإغلاق القائمة الجانبية
+        menuToggle.addEventListener('click', () => {
+            if(window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('closed');
+                mainContent.classList.toggle('expanded');
+            }
+        });
+
+        // الوضع الليلي
+        let isDarkMode = localStorage.getItem('theme') === 'dark';
+        if (isDarkMode) applyDarkTheme();
+
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                applyDarkTheme();
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.removeAttribute('data-theme');
+                themeToggle.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        function applyDarkTheme() {
+            document.body.setAttribute('data-theme', 'dark');
+            themeToggle.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        // --- 2. دوال المساعدة (Loader & Toast) ---
+        function showLoader() { document.getElementById('loader').classList.add('active'); }
+        function hideLoader() { document.getElementById('loader').classList.remove('active'); }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- 3. الاتصال بـ Google Apps Script API ---
+        // الرابط الخاص بك
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
+
+        async function testAPIConnection() {
+            showLoader();
+            const resultDiv = document.getElementById('apiResult');
+            
+            try {
+                // إرسال طلب GET للاختبار
+                const response = await fetch(`${SCRIPT_URL}?action=test`);
+                
+                // إذا لم يكن الـ Apps script مهيأ بدالة doGet، سيحدث خطأ CORS هنا
+                if (!response.ok) throw new Error('فشل الاتصال بالخادم');
+                
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = JSON.stringify(data, null, 2);
+                showToast("تم الاتصال بنجاح!", "success");
+
+            } catch (error) {
+                console.error("API Error:", error);
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<span style="color: var(--danger);">حدث خطأ! تأكد من إضافة دالة doGet في ملف Apps Script ونشره كـ Web App بصلاحية Anyone.</span>`;
+                showToast("حدث خطأ في الاتصال", "error");
+            } finally {
+                hideLoader();
+            }
+        }
+    </script>
+</body>
+</html>
