@@ -144,7 +144,7 @@
             gap: 20px;
         }
 
-        /* أقسام الصفحات (Pages Sections) */
+        /* أقسام الصفحات */
         .page-section {
             display: none;
             animation: fadeIn 0.4s ease forwards;
@@ -196,8 +196,6 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 5px 14px rgba(0,0,0,0.05);
-            text-align: center;
-            color: var(--text-muted);
         }
 
         /* Buttons */
@@ -217,11 +215,52 @@
         }
         .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
-        /* Loader & Toasts (كما هي بدون تغيير) */
+        /* النوافذ المنبثقة (Modals) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 2000; visibility: hidden; opacity: 0; transition: var(--transition);
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        
+        .modal-content {
+            background-color: var(--card-bg); width: 100%; max-width: 500px;
+            border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-20px); transition: var(--transition);
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--text-main); }
+        .close-modal { cursor: pointer; font-size: 20px; color: var(--text-muted); transition: var(--transition); }
+        .close-modal:hover { color: var(--danger); }
+        
+        /* النماذج (Forms) */
+        .form-group { margin-bottom: 15px; text-align: right; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-main); font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px;
+            background-color: var(--bg-color); color: var(--text-main); font-family: inherit; transition: var(--transition);
+        }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+
+        /* الجداول (Tables) */
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; text-align: right; }
+        th { padding: 15px; color: var(--text-muted); font-weight: 500; border-bottom: 2px solid var(--border-color); background: var(--bg-color); }
+        td { padding: 15px; color: var(--text-main); border-bottom: 1px solid var(--border-color); }
+        tr:hover { background-color: rgba(67, 97, 238, 0.02); }
+        .action-btn { border: none; padding: 8px; border-radius: 5px; cursor: pointer; margin-left: 5px; transition: var(--transition); }
+        .edit-btn { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
+        .delete-btn { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
+        .edit-btn:hover { background: var(--primary); color: white; }
+        .delete-btn:hover { background: var(--danger); color: white; }
+
+        /* Loader & Toasts */
         .loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
-            z-index: 1000; visibility: hidden; opacity: 0; transition: var(--transition);
+            z-index: 3000; visibility: hidden; opacity: 0; transition: var(--transition);
         }
         .loader-overlay.active { visibility: visible; opacity: 1; }
         .spinner {
@@ -230,7 +269,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+        #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
         .toast { background-color: var(--card-bg); color: var(--text-main); padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; border-right: 4px solid var(--primary); animation: slideIn 0.3s ease forwards; }
         .toast.success { border-right-color: var(--success); } .toast.error { border-right-color: var(--danger); }
         @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -244,7 +283,7 @@
 </head>
 <body>
 
-    <!-- Sidebar (تم إضافة data-target لكل رابط) -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="logo">
             <i class="fa-solid fa-store"></i> MiniBM
@@ -276,11 +315,7 @@
             </div>
         </header>
 
-        <!-- ======================= -->
-        <!-- بداية أقسام النظام المختلفة -->
-        <!-- ======================= -->
-
-        <!-- 1. لوحة التحكم (القسم الافتراضي) -->
+        <!-- 1. لوحة التحكم -->
         <section id="dashboard-section" class="page-section active">
             <div class="section-header"><h2>نظرة عامة</h2></div>
             <div class="cards-grid">
@@ -302,10 +337,9 @@
                 </div>
             </div>
 
-            <!-- زر الاختبار -->
-            <div class="content-box">
+            <div class="content-box" style="text-align: center;">
                 <h2 style="margin-bottom: 15px; color: var(--text-main);">اختبار الاتصال بقاعدة البيانات</h2>
-                <p style="margin-bottom: 25px;">انقر على الزر بالأسفل لاختبار إرسال طلب إلى Google Apps Script.</p>
+                <p style="margin-bottom: 25px; color: var(--text-muted);">انقر على الزر بالأسفل لاختبار إرسال طلب إلى Google Apps Script.</p>
                 <button class="btn" onclick="testAPIConnection()"><i class="fa-solid fa-plug"></i> اختبار الاتصال الآن</button>
                 <div id="apiResult" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-family: monospace; text-align: left; direction: ltr; display: none;"></div>
             </div>
@@ -313,19 +347,50 @@
 
         <!-- 2. قسم العملاء -->
         <section id="customers-section" class="page-section">
-            <div class="section-header"><h2>إدارة العملاء</h2></div>
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <h2>إدارة العملاء</h2>
+                <button class="btn" onclick="openCustomerModal()"><i class="fa-solid fa-plus"></i> إضافة عميل جديد</button>
+            </div>
+            
             <div class="content-box">
-                <i class="fa-solid fa-users" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
-                <h3>جاري تجهيز قسم العملاء</h3>
-                <p>هنا سيظهر جدول العملاء مع أزرار لإضافة وتعديل وحذف بيانات العملاء.</p>
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="searchCustomer" placeholder="ابحث عن عميل بالاسم أو رقم الهاتف..." style="width: 100%; max-width: 400px; padding: 10px 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-main); font-family: inherit;">
+                    <button class="btn" style="padding: 10px 15px;"><i class="fa-solid fa-search"></i></button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>كود العميل</th>
+                                <th>الاسم</th>
+                                <th>رقم الهاتف</th>
+                                <th>إجمالي المشتريات</th>
+                                <th style="text-align: center;">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr>
+                                <td><span style="background: var(--bg-color); padding: 5px 10px; border-radius: 5px; font-family: monospace;">#CUST-001</span></td>
+                                <td style="font-weight: 500;">أحمد محمد</td>
+                                <td>01012345678</td>
+                                <td style="color: var(--success); font-weight: bold;">1,500 ج.م</td>
+                                <td style="text-align: center;">
+                                    <button class="action-btn edit-btn" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="action-btn delete-btn" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
         <!-- 3. قسم المنتجات -->
         <section id="products-section" class="page-section">
             <div class="section-header"><h2>إدارة المنتجات والمخزون</h2></div>
-            <div class="content-box">
-                <i class="fa-solid fa-box-open" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <div class="content-box" style="text-align: center; color: var(--text-muted);">
+                <i class="fa-solid fa-box-open" style="font-size: 50px; margin-bottom: 15px;"></i>
                 <h3>جاري تجهيز قسم المنتجات</h3>
                 <p>هنا سيظهر المخزون وأسعار البيع والشراء الخاص بكل منتج.</p>
             </div>
@@ -334,8 +399,8 @@
         <!-- 4. قسم المبيعات -->
         <section id="sales-section" class="page-section">
             <div class="section-header"><h2>إدارة المبيعات</h2></div>
-            <div class="content-box">
-                <i class="fa-solid fa-cart-shopping" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <div class="content-box" style="text-align: center; color: var(--text-muted);">
+                <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 15px;"></i>
                 <h3>جاري تجهيز قسم المبيعات</h3>
                 <p>هنا سيمكنك إنشاء فواتير جديدة وتسجيل عمليات البيع.</p>
             </div>
@@ -344,8 +409,8 @@
         <!-- 5. قسم المصروفات -->
         <section id="expenses-section" class="page-section">
             <div class="section-header"><h2>إدارة المصروفات</h2></div>
-            <div class="content-box">
-                <i class="fa-solid fa-wallet" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <div class="content-box" style="text-align: center; color: var(--text-muted);">
+                <i class="fa-solid fa-wallet" style="font-size: 50px; margin-bottom: 15px;"></i>
                 <h3>جاري تجهيز قسم المصروفات</h3>
                 <p>هنا ستتمكن من تسجيل المصروفات اليومية والشهرية للنظام.</p>
             </div>
@@ -354,8 +419,8 @@
         <!-- 6. قسم التقارير -->
         <section id="reports-section" class="page-section">
             <div class="section-header"><h2>التقارير والإحصائيات</h2></div>
-            <div class="content-box">
-                <i class="fa-solid fa-chart-pie" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <div class="content-box" style="text-align: center; color: var(--text-muted);">
+                <i class="fa-solid fa-chart-pie" style="font-size: 50px; margin-bottom: 15px;"></i>
                 <h3>جاري تجهيز قسم التقارير</h3>
                 <p>هنا ستتمكن من استخراج تقارير الأرباح والمبيعات وتصديرها.</p>
             </div>
@@ -364,8 +429,8 @@
         <!-- 7. قسم الإعدادات -->
         <section id="settings-section" class="page-section">
             <div class="section-header"><h2>إعدادات النظام</h2></div>
-            <div class="content-box">
-                <i class="fa-solid fa-gears" style="font-size: 50px; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <div class="content-box" style="text-align: center; color: var(--text-muted);">
+                <i class="fa-solid fa-gears" style="font-size: 50px; margin-bottom: 15px;"></i>
                 <h3>جاري تجهيز قسم الإعدادات</h3>
                 <p>هنا سيمكنك التحكم في اسم متجرك والشعار والعملة المستخدمة.</p>
             </div>
@@ -373,36 +438,63 @@
 
     </main>
 
+    <!-- نافذة إضافة/تعديل عميل (Modal) -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">إضافة عميل جديد</h3>
+                <i class="fa-solid fa-xmark close-modal" onclick="closeCustomerModal()"></i>
+            </div>
+            <form id="customerForm" onsubmit="handleCustomerSubmit(event)">
+                <div class="form-group">
+                    <label>اسم العميل *</label>
+                    <input type="text" id="custName" required placeholder="أدخل اسم العميل ثلاثي">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف *</label>
+                    <input type="text" id="custPhone" required placeholder="مثال: 01xxxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني (اختياري)</label>
+                    <input type="email" id="custEmail" placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>العنوان (اختياري)</label>
+                    <input type="text" id="custAddress" placeholder="عنوان العميل بالتفصيل">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="submit" class="btn" style="flex: 1;"><i class="fa-solid fa-save"></i> حفظ البيانات</button>
+                    <button type="button" class="btn" style="flex: 1; background-color: var(--text-muted);" onclick="closeCustomerModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Loader & Toasts -->
     <div class="loader-overlay" id="loader"><div class="spinner"></div></div>
     <div id="toast-container"></div>
 
     <script>
-        // --- 1. إعدادات التنقل بين الأقسام (Navigation Logic) ---
+        // --- 1. إعدادات التنقل بين الأقسام ---
         const navLinks = document.querySelectorAll('.nav-links a');
         const pageSections = document.querySelectorAll('.page-section');
 
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
-                // إزالة اللون من كل الروابط وإخفاء كل الأقسام
                 navLinks.forEach(item => item.classList.remove('active'));
                 pageSections.forEach(section => section.classList.remove('active'));
 
-                // إضافة اللون للرابط الذي تم الضغط عليه
                 this.classList.add('active');
-
-                // جلب اسم القسم المستهدف وإظهاره
                 const targetId = this.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
 
-                // إغلاق القائمة الجانبية في الموبايل بعد الضغط
                 if(window.innerWidth <= 768) {
                     sidebar.classList.remove('active');
                 }
             });
         });
 
-        // --- 2. إعدادات الواجهة (Theme & Sidebar Toggle) ---
+        // --- 2. إعدادات الواجهة (Theme & Sidebar) ---
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const menuToggle = document.getElementById('menuToggle');
@@ -454,7 +546,27 @@
             }, 3000);
         }
 
-        // --- 4. الاتصال بـ Google Apps Script API ---
+        // --- 4. منطق قسم العملاء ---
+        function openCustomerModal() {
+            document.getElementById('customerModal').classList.add('active');
+            document.getElementById('customerForm').reset();
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('customerModal').classList.remove('active');
+        }
+
+        function handleCustomerSubmit(e) {
+            e.preventDefault();
+            showLoader();
+            setTimeout(() => {
+                hideLoader();
+                showToast('تم حفظ بيانات العميل بنجاح!', 'success');
+                closeCustomerModal();
+            }, 1000);
+        }
+
+        // --- 5. الاتصال بـ Google Apps Script API ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
 
         async function testAPIConnection() {
@@ -470,7 +582,7 @@
             } catch (error) {
                 console.error("API Error:", error);
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<span style="color: var(--danger);">حدث خطأ! تأكد من إضافة دالة doGet...</span>`;
+                resultDiv.innerHTML = `<span style="color: var(--danger);">حدث خطأ في الاتصال!</span>`;
                 showToast("حدث خطأ في الاتصال", "error");
             } finally {
                 hideLoader();
