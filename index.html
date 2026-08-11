@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Business Manager</title>
-    <!-- خطوط جوجل (Tajawal) -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- أيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* المتغيرات الأساسية */
         :root {
             --primary: #4361ee;
             --primary-hover: #3a53d0;
@@ -26,7 +23,6 @@
             --transition: all 0.3s ease;
         }
 
-        /* الوضع الليلي */
         [data-theme="dark"] {
             --bg-color: #0b1437;
             --sidebar-bg: #111c44;
@@ -36,237 +32,67 @@
             --border-color: #2b3674;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Tajawal', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; transition: var(--transition); }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: var(--transition);
-        }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border-color); padding: 20px 0; position: fixed; height: 100vh; transition: var(--transition); z-index: 100; }
+        .sidebar.closed { transform: translateX(100%); }
+        .logo { text-align: center; font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 40px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .nav-links { list-style: none; }
+        .nav-links li a { display: flex; align-items: center; padding: 15px 25px; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: var(--transition); gap: 15px; cursor: pointer; }
+        .nav-links li a:hover, .nav-links li a.active { color: var(--primary); background-color: rgba(67, 97, 238, 0.05); border-right: 4px solid var(--primary); }
 
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            border-left: 1px solid var(--border-color);
-            padding: 20px 0;
-            position: fixed;
-            height: 100vh;
-            transition: var(--transition);
-            z-index: 100;
-        }
+        .main-content { flex: 1; margin-right: 260px; padding: 20px; transition: var(--transition); width: calc(100% - 260px); }
+        .main-content.expanded { margin-right: 0; width: 100%; }
 
-        .sidebar.closed {
-            transform: translateX(100%);
-        }
-
-        .logo {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .nav-links {
-            list-style: none;
-        }
-
-        .nav-links li a {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            gap: 15px;
-            cursor: pointer;
-        }
-
-        .nav-links li a:hover, .nav-links li a.active {
-            color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.05);
-            border-right: 4px solid var(--primary);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-right: 260px;
-            padding: 20px;
-            transition: var(--transition);
-            width: calc(100% - 260px);
-        }
-
-        .main-content.expanded {
-            margin-right: 0;
-            width: 100%;
-        }
-
-        /* Topbar */
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-
-        .menu-toggle, .theme-toggle {
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-main);
-            transition: var(--transition);
-        }
-        
+        .topbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg); padding: 15px 20px; border-radius: 15px; box-shadow: 0 5px 14px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .menu-toggle, .theme-toggle { cursor: pointer; font-size: 20px; color: var(--text-main); transition: var(--transition); }
         .theme-toggle { color: var(--text-muted); }
         .theme-toggle:hover { color: var(--primary); }
+        .topbar-actions { display: flex; align-items: center; gap: 20px; }
 
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        .page-section { display: none; animation: fadeIn 0.4s ease forwards; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* أقسام الصفحات */
-        .page-section {
-            display: none;
-            animation: fadeIn 0.4s ease forwards;
-        }
-
-        .page-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Dashboard Cards */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background-color: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 5px 14px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; }
         .card-info h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; }
         .card-info h2 { font-size: 24px; color: var(--text-main); }
         .card-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        
         .icon-blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
         .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
         .icon-red { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
         .icon-yellow { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
 
-        /* General Section Layout */
-        .section-header {
-            margin-bottom: 20px;
-            color: var(--text-main);
-        }
-        .content-box {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
-        }
+        .section-header { margin-bottom: 20px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .content-box { background-color: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 5px 14px rgba(0,0,0,0.05); }
 
-        /* Buttons */
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 10px; }
         .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
-        /* النوافذ المنبثقة (Modals) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
-            z-index: 2000; visibility: hidden; opacity: 0; transition: var(--transition);
-            backdrop-filter: blur(3px);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: var(--transition); backdrop-filter: blur(3px); }
         .modal-overlay.active { visibility: visible; opacity: 1; }
-        
-        .modal-content {
-            background-color: var(--card-bg); width: 100%; max-width: 500px;
-            border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transform: translateY(-20px); transition: var(--transition);
-        }
+        .modal-content { background-color: var(--card-bg); width: 100%; max-width: 500px; border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateY(-20px); transition: var(--transition); max-height: 90vh; overflow-y: auto; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-        
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--text-main); }
         .close-modal { cursor: pointer; font-size: 20px; color: var(--text-muted); transition: var(--transition); }
         .close-modal:hover { color: var(--danger); }
-        
-        /* النماذج (Forms) */
+
         .form-group { margin-bottom: 15px; text-align: right; }
         .form-group label { display: block; margin-bottom: 8px; color: var(--text-main); font-weight: 500; font-size: 14px; }
-        .form-group input, .form-group textarea {
-            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px;
-            background-color: var(--bg-color); color: var(--text-main); font-family: inherit; transition: var(--transition);
-        }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--bg-color); color: var(--text-main); font-family: inherit; transition: var(--transition); }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
 
-        /* الجداول (Tables) */
         .table-container { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; text-align: right; }
         th { padding: 15px; color: var(--text-muted); font-weight: 500; border-bottom: 2px solid var(--border-color); background: var(--bg-color); }
         td { padding: 15px; color: var(--text-main); border-bottom: 1px solid var(--border-color); }
         tr:hover { background-color: rgba(67, 97, 238, 0.02); }
-        .action-btn { border: none; padding: 8px; border-radius: 5px; cursor: pointer; margin-left: 5px; transition: var(--transition); }
-        .edit-btn { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
-        .delete-btn { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
-        .edit-btn:hover { background: var(--primary); color: white; }
-        .delete-btn:hover { background: var(--danger); color: white; }
 
-        /* Loader & Toasts */
-        .loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
-            z-index: 3000; visibility: hidden; opacity: 0; transition: var(--transition);
-        }
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 3000; visibility: hidden; opacity: 0; transition: var(--transition); }
         .loader-overlay.active { visibility: visible; opacity: 1; }
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%;
-            width: 40px; height: 40px; animation: spin 1s linear infinite;
-        }
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
@@ -283,11 +109,8 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-store"></i> MiniBM
-        </div>
+        <div class="logo"><i class="fa-solid fa-store"></i> MiniBM</div>
         <ul class="nav-links">
             <li><a class="active" data-target="dashboard-section"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</a></li>
             <li><a data-target="customers-section"><i class="fa-solid fa-users"></i> العملاء</a></li>
@@ -299,13 +122,9 @@
         </ul>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
-        <!-- Topbar -->
         <header class="topbar">
-            <div class="menu-toggle" id="menuToggle">
-                <i class="fa-solid fa-bars"></i>
-            </div>
+            <div class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></div>
             <div class="topbar-actions">
                 <i class="fa-solid fa-moon theme-toggle" id="themeToggle"></i>
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -319,45 +138,25 @@
         <section id="dashboard-section" class="page-section active">
             <div class="section-header"><h2>نظرة عامة</h2></div>
             <div class="cards-grid">
-                <div class="card">
-                    <div class="card-info"><h3>إجمالي المبيعات</h3><h2>0 ج.م</h2></div>
-                    <div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div>
-                </div>
-                <div class="card">
-                    <div class="card-info"><h3>عدد العملاء</h3><h2>0</h2></div>
-                    <div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div>
-                </div>
-                <div class="card">
-                    <div class="card-info"><h3>المصروفات</h3><h2>0 ج.م</h2></div>
-                    <div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div>
-                </div>
-                <div class="card">
-                    <div class="card-info"><h3>المنتجات</h3><h2>0</h2></div>
-                    <div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div>
-                </div>
+                <div class="card"><div class="card-info"><h3>إجمالي المبيعات</h3><h2>0 ج.م</h2></div><div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div></div>
+                <div class="card"><div class="card-info"><h3>عدد العملاء</h3><h2 id="dashCustCount">0</h2></div><div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div></div>
+                <div class="card"><div class="card-info"><h3>المصروفات</h3><h2>0 ج.م</h2></div><div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div></div>
+                <div class="card"><div class="card-info"><h3>المنتجات</h3><h2 id="dashProdCount">0</h2></div><div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div></div>
             </div>
-
             <div class="content-box" style="text-align: center;">
-                <h2 style="margin-bottom: 15px; color: var(--text-main);">اختبار الاتصال بقاعدة البيانات</h2>
-                <p style="margin-bottom: 25px; color: var(--text-muted);">انقر على الزر بالأسفل لاختبار إرسال طلب إلى Google Apps Script.</p>
+                <h2 style="margin-bottom: 15px;">اختبار الاتصال بقاعدة البيانات</h2>
                 <button class="btn" onclick="testAPIConnection()"><i class="fa-solid fa-plug"></i> اختبار الاتصال الآن</button>
                 <div id="apiResult" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-family: monospace; text-align: left; direction: ltr; display: none;"></div>
             </div>
         </section>
 
-        <!-- 2. قسم العملاء -->
+        <!-- 2. العملاء -->
         <section id="customers-section" class="page-section">
-            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div class="section-header">
                 <h2>إدارة العملاء</h2>
-                <button class="btn" onclick="openCustomerModal()"><i class="fa-solid fa-plus"></i> إضافة عميل جديد</button>
+                <button class="btn" onclick="openModal('customerModal')"><i class="fa-solid fa-plus"></i> إضافة عميل جديد</button>
             </div>
-            
             <div class="content-box">
-                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-                    <input type="text" id="searchCustomer" placeholder="ابحث عن عميل بالاسم أو رقم الهاتف..." style="width: 100%; max-width: 400px; padding: 10px 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-main); font-family: inherit;">
-                    <button class="btn" style="padding: 10px 15px;"><i class="fa-solid fa-search"></i></button>
-                </div>
-
                 <div class="table-container">
                     <table>
                         <thead>
@@ -365,117 +164,133 @@
                                 <th>كود العميل</th>
                                 <th>الاسم</th>
                                 <th>رقم الهاتف</th>
+                                <th>العنوان</th>
                                 <th>إجمالي المشتريات</th>
-                                <th style="text-align: center;">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="customersTableBody">
-                            <tr>
-                                <td><span style="background: var(--bg-color); padding: 5px 10px; border-radius: 5px; font-family: monospace;">#CUST-001</span></td>
-                                <td style="font-weight: 500;">أحمد محمد</td>
-                                <td>01012345678</td>
-                                <td style="color: var(--success); font-weight: bold;">1,500 ج.م</td>
-                                <td style="text-align: center;">
-                                    <button class="action-btn edit-btn" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="action-btn delete-btn" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
+                            <tr><td colspan="5" style="text-align: center;">جاري التحميل...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- 3. قسم المنتجات -->
+        <!-- 3. المنتجات -->
         <section id="products-section" class="page-section">
-            <div class="section-header"><h2>إدارة المنتجات والمخزون</h2></div>
-            <div class="content-box" style="text-align: center; color: var(--text-muted);">
-                <i class="fa-solid fa-box-open" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>جاري تجهيز قسم المنتجات</h3>
-                <p>هنا سيظهر المخزون وأسعار البيع والشراء الخاص بكل منتج.</p>
+            <div class="section-header">
+                <h2>إدارة المنتجات والمخزون</h2>
+                <button class="btn" onclick="openModal('productModal')"><i class="fa-solid fa-plus"></i> إضافة منتج جديد</button>
+            </div>
+            <div class="content-box">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>كود المنتج</th>
+                                <th>اسم المنتج</th>
+                                <th>التصنيف</th>
+                                <th>سعر الشراء</th>
+                                <th>سعر البيع</th>
+                                <th>الكمية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr><td colspan="6" style="text-align: center;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
-        <!-- 4. قسم المبيعات -->
+        <!-- 4. المبيعات -->
         <section id="sales-section" class="page-section">
             <div class="section-header"><h2>إدارة المبيعات</h2></div>
             <div class="content-box" style="text-align: center; color: var(--text-muted);">
                 <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>جاري تجهيز قسم المبيعات</h3>
-                <p>هنا سيمكنك إنشاء فواتير جديدة وتسجيل عمليات البيع.</p>
+                <h3>قسم المبيعات</h3>
+                <p>قريباً ربط فواتير البيع وتحديث المخزون تلقائياً.</p>
             </div>
         </section>
 
-        <!-- 5. قسم المصروفات -->
+        <!-- 5. المصروفات -->
         <section id="expenses-section" class="page-section">
             <div class="section-header"><h2>إدارة المصروفات</h2></div>
             <div class="content-box" style="text-align: center; color: var(--text-muted);">
                 <i class="fa-solid fa-wallet" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>جاري تجهيز قسم المصروفات</h3>
-                <p>هنا ستتمكن من تسجيل المصروفات اليومية والشهرية للنظام.</p>
+                <h3>قسم المصروفات</h3>
+                <p>قريباً تسجيل المصروفات اليومية.</p>
             </div>
         </section>
 
-        <!-- 6. قسم التقارير -->
+        <!-- 6. التقارير -->
         <section id="reports-section" class="page-section">
             <div class="section-header"><h2>التقارير والإحصائيات</h2></div>
             <div class="content-box" style="text-align: center; color: var(--text-muted);">
                 <i class="fa-solid fa-chart-pie" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>جاري تجهيز قسم التقارير</h3>
-                <p>هنا ستتمكن من استخراج تقارير الأرباح والمبيعات وتصديرها.</p>
+                <h3>قسم التقارير</h3>
+                <p>قريباً استخراج تقارير الأرباح والمبيعات.</p>
             </div>
         </section>
 
-        <!-- 7. قسم الإعدادات -->
+        <!-- 7. الإعدادات -->
         <section id="settings-section" class="page-section">
             <div class="section-header"><h2>إعدادات النظام</h2></div>
             <div class="content-box" style="text-align: center; color: var(--text-muted);">
                 <i class="fa-solid fa-gears" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>جاري تجهيز قسم الإعدادات</h3>
-                <p>هنا سيمكنك التحكم في اسم متجرك والشعار والعملة المستخدمة.</p>
+                <h3>إعدادات المتجر</h3>
+                <p>تخصيص اسم المتجر والعملة.</p>
             </div>
         </section>
-
     </main>
 
-    <!-- نافذة إضافة/تعديل عميل (Modal) -->
+    <!-- Modal: إضافة عميل -->
     <div class="modal-overlay" id="customerModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">إضافة عميل جديد</h3>
-                <i class="fa-solid fa-xmark close-modal" onclick="closeCustomerModal()"></i>
+                <h3>إضافة عميل جديد</h3>
+                <i class="fa-solid fa-xmark close-modal" onclick="closeModal('customerModal')"></i>
             </div>
             <form id="customerForm" onsubmit="handleCustomerSubmit(event)">
-                <div class="form-group">
-                    <label>اسم العميل *</label>
-                    <input type="text" id="custName" required placeholder="أدخل اسم العميل ثلاثي">
-                </div>
-                <div class="form-group">
-                    <label>رقم الهاتف *</label>
-                    <input type="text" id="custPhone" required placeholder="مثال: 01xxxxxxxxx">
-                </div>
-                <div class="form-group">
-                    <label>البريد الإلكتروني (اختياري)</label>
-                    <input type="email" id="custEmail" placeholder="example@mail.com">
-                </div>
-                <div class="form-group">
-                    <label>العنوان (اختياري)</label>
-                    <input type="text" id="custAddress" placeholder="عنوان العميل بالتفصيل">
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 25px;">
-                    <button type="submit" class="btn" style="flex: 1;"><i class="fa-solid fa-save"></i> حفظ البيانات</button>
-                    <button type="button" class="btn" style="flex: 1; background-color: var(--text-muted);" onclick="closeCustomerModal()">إلغاء</button>
-                </div>
+                <div class="form-group"><label>اسم العميل *</label><input type="text" id="custName" required></div>
+                <div class="form-group"><label>رقم الهاتف *</label><input type="text" id="custPhone" required></div>
+                <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="custEmail"></div>
+                <div class="form-group"><label>العنوان</label><input type="text" id="custAddress"></div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;"><i class="fa-solid fa-save"></i> حفظ العميل</button>
             </form>
         </div>
     </div>
 
-    <!-- Loader & Toasts -->
+    <!-- Modal: إضافة منتج -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة منتج جديد</h3>
+                <i class="fa-solid fa-xmark close-modal" onclick="closeModal('productModal')"></i>
+            </div>
+            <form id="productForm" onsubmit="handleProductSubmit(event)">
+                <div class="form-group"><label>اسم المنتج *</label><input type="text" id="prodName" required></div>
+                <div class="form-group"><label>التصنيف</label><input type="text" id="prodCategory" placeholder="مثال: إلكترونيات"></div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;"><label>سعر الشراء *</label><input type="number" step="0.01" id="prodPurchasePrice" required></div>
+                    <div style="flex: 1;"><label>سعر البيع *</label><input type="number" step="0.01" id="prodSalePrice" required></div>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;"><label>الكمية الحالية *</label><input type="number" id="prodQuantity" required></div>
+                    <div style="flex: 1;"><label>الحد الأدنى للمخزون</label><input type="number" id="prodMinStock" value="5"></div>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;"><i class="fa-solid fa-save"></i> حفظ المنتج</button>
+            </form>
+        </div>
+    </div>
+
     <div class="loader-overlay" id="loader"><div class="spinner"></div></div>
     <div id="toast-container"></div>
 
     <script>
-        // --- 1. إعدادات التنقل بين الأقسام ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
+
+        // Navigation
         const navLinks = document.querySelectorAll('.nav-links a');
         const pageSections = document.querySelectorAll('.page-section');
 
@@ -483,53 +298,30 @@
             link.addEventListener('click', function() {
                 navLinks.forEach(item => item.classList.remove('active'));
                 pageSections.forEach(section => section.classList.remove('active'));
-
                 this.classList.add('active');
                 const targetId = this.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
-
-                if(window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                }
+                if(targetId === 'customers-section') loadCustomers();
+                if(targetId === 'products-section') loadProducts();
+                if(window.innerWidth <= 768) sidebar.classList.remove('active');
             });
         });
 
-        // --- 2. إعدادات الواجهة (Theme & Sidebar) ---
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        const menuToggle = document.getElementById('menuToggle');
-        const themeToggle = document.getElementById('themeToggle');
-        
+        const sidebar = document.getElementById('sidebar'), mainContent = document.getElementById('mainContent'), menuToggle = document.getElementById('menuToggle'), themeToggle = document.getElementById('themeToggle');
         menuToggle.addEventListener('click', () => {
-            if(window.innerWidth <= 768) {
-                sidebar.classList.toggle('active');
-            } else {
-                sidebar.classList.toggle('closed');
-                mainContent.classList.toggle('expanded');
-            }
+            if(window.innerWidth <= 768) sidebar.classList.toggle('active');
+            else { sidebar.classList.toggle('closed'); mainContent.classList.toggle('expanded'); }
         });
 
         let isDarkMode = localStorage.getItem('theme') === 'dark';
         if (isDarkMode) applyDarkTheme();
-
         themeToggle.addEventListener('click', () => {
             isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                applyDarkTheme();
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.removeAttribute('data-theme');
-                themeToggle.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
+            if (isDarkMode) { applyDarkTheme(); localStorage.setItem('theme', 'dark'); }
+            else { document.body.removeAttribute('data-theme'); themeToggle.classList.replace('fa-sun', 'fa-moon'); localStorage.setItem('theme', 'light'); }
         });
+        function applyDarkTheme() { document.body.setAttribute('data-theme', 'dark'); themeToggle.classList.replace('fa-moon', 'fa-sun'); }
 
-        function applyDarkTheme() {
-            document.body.setAttribute('data-theme', 'dark');
-            themeToggle.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        // --- 3. دوال المساعدة (Loader & Toast) ---
         function showLoader() { document.getElementById('loader').classList.add('active'); }
         function hideLoader() { document.getElementById('loader').classList.remove('active'); }
 
@@ -537,57 +329,136 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation'}"></i> <span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // --- 4. منطق قسم العملاء ---
-        function openCustomerModal() {
-            document.getElementById('customerModal').classList.add('active');
-            document.getElementById('customerForm').reset();
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // --- جلب وحفظ العملاء ---
+        async function loadCustomers() {
+            showLoader();
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getCustomers`);
+                const data = await res.json();
+                const tbody = document.getElementById('customersTableBody');
+                tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا يوجد عملاء مضافون بعد</td></tr>`;
+                } else {
+                    data.forEach(c => {
+                        tbody.innerHTML += `<tr>
+                            <td><code>${c.CustomerID}</code></td>
+                            <td>${c.Name}</td>
+                            <td>${c.Phone}</td>
+                            <td>${c.Address || '-'}</td>
+                            <td style="color: var(--success); font-weight: bold;">${c.TotalPurchases || 0} ج.م</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('dashCustCount').innerText = data.length;
+            } catch (err) {
+                showToast("فشل تحميل العملاء", "error");
+            } finally { hideLoader(); }
         }
 
-        function closeCustomerModal() {
-            document.getElementById('customerModal').classList.remove('active');
-        }
-
-        function handleCustomerSubmit(e) {
+        async function handleCustomerSubmit(e) {
             e.preventDefault();
             showLoader();
-            setTimeout(() => {
-                hideLoader();
-                showToast('تم حفظ بيانات العميل بنجاح!', 'success');
-                closeCustomerModal();
-            }, 1000);
+            const payload = {
+                action: "addCustomer",
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                email: document.getElementById('custEmail').value,
+                address: document.getElementById('custAddress').value
+            };
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if(result.status === 'success') {
+                    showToast(result.message, 'success');
+                    closeModal('customerModal');
+                    loadCustomers();
+                } else { throw new Error(result.message); }
+            } catch (err) {
+                showToast("حدث خطأ أثناء الحفظ", "error");
+            } finally { hideLoader(); }
         }
 
-        // --- 5. الاتصال بـ Google Apps Script API ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
+        // --- جلب وحفظ المنتجات (المشكلة التي تم حلها) ---
+        async function loadProducts() {
+            showLoader();
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getProducts`);
+                const data = await res.json();
+                const tbody = document.getElementById('productsTableBody');
+                tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد منتجات مضافة بعد</td></tr>`;
+                } else {
+                    data.forEach(p => {
+                        tbody.innerHTML += `<tr>
+                            <td><code>${p.ProductID}</code></td>
+                            <td>${p.Name}</td>
+                            <td>${p.Category}</td>
+                            <td>${p.PurchasePrice} ج.م</td>
+                            <td>${p.SalePrice} ج.م</td>
+                            <td style="font-weight: bold; color: ${p.Quantity <= p.MinStock ? 'var(--danger)' : 'var(--success)'}">${p.Quantity}</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('dashProdCount').innerText = data.length;
+            } catch (err) {
+                showToast("فشل تحميل المنتجات", "error");
+            } finally { hideLoader(); }
+        }
+
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            showLoader();
+            const payload = {
+                action: "addProduct",
+                name: document.getElementById('prodName').value,
+                category: document.getElementById('prodCategory').value,
+                purchasePrice: parseFloat(document.getElementById('prodPurchasePrice').value),
+                salePrice: parseFloat(document.getElementById('prodSalePrice').value),
+                quantity: parseInt(document.getElementById('prodQuantity').value),
+                minStock: parseInt(document.getElementById('prodMinStock').value)
+            };
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if(result.status === 'success') {
+                    showToast(result.message, 'success');
+                    closeModal('productModal');
+                    loadProducts();
+                } else { throw new Error(result.message); }
+            } catch (err) {
+                showToast("حدث خطأ أثناء حفظ المنتج", "error");
+            } finally { hideLoader(); }
+        }
 
         async function testAPIConnection() {
             showLoader();
             const resultDiv = document.getElementById('apiResult');
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=test`);
-                if (!response.ok) throw new Error('فشل الاتصال بالخادم');
                 const data = await response.json();
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = JSON.stringify(data, null, 2);
-                showToast("تم الاتصال بنجاح!", "success");
+                showToast("الاتصال يعمل بكفاءة!", "success");
             } catch (error) {
-                console.error("API Error:", error);
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<span style="color: var(--danger);">حدث خطأ في الاتصال!</span>`;
-                showToast("حدث خطأ في الاتصال", "error");
-            } finally {
-                hideLoader();
-            }
+                resultDiv.innerHTML = `<span style="color: var(--danger);">خطأ في الاتصال بالخادم.</span>`;
+                showToast("فشل الاتصال", "error");
+            } finally { hideLoader(); }
         }
+
+        // التحميل الأولي عند فتح الصفحة
+        loadCustomers();
+        loadProducts();
     </script>
 </body>
 </html>
