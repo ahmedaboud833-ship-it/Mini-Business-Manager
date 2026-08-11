@@ -66,14 +66,14 @@
         .icon-yellow { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
 
         .section-header { margin-bottom: 20px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .content-box { background-color: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 5px 14px rgba(0,0,0,0.05); }
+        .content-box { background-color: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 5px 14px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
         .btn { background-color: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 10px; }
         .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: var(--transition); backdrop-filter: blur(3px); }
         .modal-overlay.active { visibility: visible; opacity: 1; }
-        .modal-content { background-color: var(--card-bg); width: 100%; max-width: 500px; border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateY(-20px); transition: var(--transition); max-height: 90vh; overflow-y: auto; }
+        .modal-content { background-color: var(--card-bg); width: 100%; max-width: 600px; border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateY(-20px); transition: var(--transition); max-height: 90vh; overflow-y: auto; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--text-main); }
         .close-modal { cursor: pointer; font-size: 20px; color: var(--text-muted); transition: var(--transition); }
@@ -110,7 +110,7 @@
 <body>
 
     <aside class="sidebar" id="sidebar">
-        <div class="logo"><i class="fa-solid fa-store"></i> MiniBM</div>
+        <div class="logo"><i class="fa-solid fa-store"></i> <span id="storeBrandName">MiniBM</span></div>
         <ul class="nav-links">
             <li><a class="active" data-target="dashboard-section"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</a></li>
             <li><a data-target="customers-section"><i class="fa-solid fa-users"></i> العملاء</a></li>
@@ -138,15 +138,10 @@
         <section id="dashboard-section" class="page-section active">
             <div class="section-header"><h2>نظرة عامة</h2></div>
             <div class="cards-grid">
-                <div class="card"><div class="card-info"><h3>إجمالي المبيعات</h3><h2>0 ج.م</h2></div><div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div></div>
+                <div class="card"><div class="card-info"><h3>إجمالي المبيعات</h3><h2 id="dashTotalSales">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-blue"><i class="fa-solid fa-money-bill-wave"></i></div></div>
                 <div class="card"><div class="card-info"><h3>عدد العملاء</h3><h2 id="dashCustCount">0</h2></div><div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div></div>
-                <div class="card"><div class="card-info"><h3>المصروفات</h3><h2>0 ج.م</h2></div><div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div></div>
+                <div class="card"><div class="card-info"><h3>المصروفات</h3><h2 id="dashTotalExpenses">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-red"><i class="fa-solid fa-arrow-trend-down"></i></div></div>
                 <div class="card"><div class="card-info"><h3>المنتجات</h3><h2 id="dashProdCount">0</h2></div><div class="card-icon icon-yellow"><i class="fa-solid fa-box-open"></i></div></div>
-            </div>
-            <div class="content-box" style="text-align: center;">
-                <h2 style="margin-bottom: 15px;">اختبار الاتصال بقاعدة البيانات</h2>
-                <button class="btn" onclick="testAPIConnection()"><i class="fa-solid fa-plug"></i> اختبار الاتصال الآن</button>
-                <div id="apiResult" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-family: monospace; text-align: left; direction: ltr; display: none;"></div>
             </div>
         </section>
 
@@ -205,81 +200,140 @@
 
         <!-- 4. المبيعات -->
         <section id="sales-section" class="page-section">
-            <div class="section-header"><h2>إدارة المبيعات</h2></div>
-            <div class="content-box" style="text-align: center; color: var(--text-muted);">
-                <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>قسم المبيعات</h3>
-                <p>قريباً ربط فواتير البيع وتحديث المخزون تلقائياً.</p>
+            <div class="section-header">
+                <h2>إدارة المبيعات والفواتير</h2>
+                <button class="btn" onclick="openModal('saleModal')"><i class="fa-solid fa-cart-plus"></i> تسجيل عملية بيع</button>
+            </div>
+            <div class="content-box">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>العميل</th>
+                                <th>التاريخ</th>
+                                <th>الإجمالي</th>
+                                <th>طريقة الدفع</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <tr><td colspan="5" style="text-align: center;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
         <!-- 5. المصروفات -->
         <section id="expenses-section" class="page-section">
-            <div class="section-header"><h2>إدارة المصروفات</h2></div>
-            <div class="content-box" style="text-align: center; color: var(--text-muted);">
-                <i class="fa-solid fa-wallet" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>قسم المصروفات</h3>
-                <p>قريباً تسجيل المصروفات اليومية.</p>
+            <div class="section-header">
+                <h2>إدارة المصروفات</h2>
+                <button class="btn" onclick="openModal('expenseModal')"><i class="fa-solid fa-plus"></i> تسجيل مصروف جديد</button>
+            </div>
+            <div class="content-box">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم العملية</th>
+                                <th>نوع المصروف</th>
+                                <th>المبلغ</th>
+                                <th>التاريخ</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody">
+                            <tr><td colspan="5" style="text-align: center;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
         <!-- 6. التقارير -->
         <section id="reports-section" class="page-section">
-            <div class="section-header"><h2>التقارير والإحصائيات</h2></div>
-            <div class="content-box" style="text-align: center; color: var(--text-muted);">
-                <i class="fa-solid fa-chart-pie" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>قسم التقارير</h3>
-                <p>قريباً استخراج تقارير الأرباح والمبيعات.</p>
+            <div class="section-header"><h2>التقارير والإحصائيات المالية</h2></div>
+            <div class="cards-grid">
+                <div class="card"><div class="card-info"><h3>صافي الأرباح (تقديري)</h3><h2 id="reportNetProfit">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-blue"><i class="fa-solid fa-chart-line"></i></div></div>
+                <div class="card"><div class="card-info"><h3>إجمالي الإيرادات</h3><h2 id="reportTotalRevenue">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-green"><i class="fa-solid fa-arrow-trend-up"></i></div></div>
+                <div class="card"><div class="card-info"><h3>إجمالي المصروفات</h3><h2 id="reportTotalExpenses">0 <span class="currency-label">ج.م</span></h2></div><div class="card-icon icon-red"><i class="fa-solid> fa-arrow-trend-down"></i></div></div>
             </div>
         </section>
 
         <!-- 7. الإعدادات -->
         <section id="settings-section" class="page-section">
-            <div class="section-header"><h2>إعدادات النظام</h2></div>
-            <div class="content-box" style="text-align: center; color: var(--text-muted);">
-                <i class="fa-solid fa-gears" style="font-size: 50px; margin-bottom: 15px;"></i>
-                <h3>إعدادات المتجر</h3>
-                <p>تخصيص اسم المتجر والعملة.</p>
+            <div class="section-header"><h2>إعدادات النظام والنشاط التجاري</h2></div>
+            <div class="content-box" style="max-width: 600px;">
+                <form id="settingsForm" onsubmit="handleSettingsSubmit(event)">
+                    <div class="form-group"><label>اسم النشاط التجاري</label><input type="text" id="settingStoreName" placeholder="Mini Business Manager" required></div>
+                    <div class="form-group"><label>العملة</label><input type="text" id="settingCurrency" placeholder="ج.م" required></div>
+                    <button type="submit" class="btn" style="width: 100%; margin-top: 15px;"><i class="fa-solid fa-save"></i> حفظ الإعدادات</button>
+                </form>
             </div>
         </section>
     </main>
 
-    <!-- Modal: إضافة عميل -->
+    <!-- Modal: عميل -->
     <div class="modal-overlay" id="customerModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>إضافة عميل جديد</h3>
-                <i class="fa-solid fa-xmark close-modal" onclick="closeModal('customerModal')"></i>
-            </div>
+            <div class="modal-header"><h3>إضافة عميل جديد</h3><i class="fa-solid fa-xmark close-modal" onclick="closeModal('customerModal')"></i></div>
             <form id="customerForm" onsubmit="handleCustomerSubmit(event)">
                 <div class="form-group"><label>اسم العميل *</label><input type="text" id="custName" required></div>
                 <div class="form-group"><label>رقم الهاتف *</label><input type="text" id="custPhone" required></div>
                 <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="custEmail"></div>
                 <div class="form-group"><label>العنوان</label><input type="text" id="custAddress"></div>
-                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;"><i class="fa-solid fa-save"></i> حفظ العميل</button>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">حفظ العميل</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal: إضافة منتج -->
+    <!-- Modal: منتج -->
     <div class="modal-overlay" id="productModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>إضافة منتج جديد</h3>
-                <i class="fa-solid fa-xmark close-modal" onclick="closeModal('productModal')"></i>
-            </div>
+            <div class="modal-header"><h3>إضافة منتج جديد</h3><i class="fa-solid fa-xmark close-modal" onclick="closeModal('productModal')"></i></div>
             <form id="productForm" onsubmit="handleProductSubmit(event)">
                 <div class="form-group"><label>اسم المنتج *</label><input type="text" id="prodName" required></div>
-                <div class="form-group"><label>التصنيف</label><input type="text" id="prodCategory" placeholder="مثال: إلكترونيات"></div>
+                <div class="form-group"><label>التصنيف</label><input type="text" id="prodCategory"></div>
                 <div class="form-group" style="display: flex; gap: 10px;">
                     <div style="flex: 1;"><label>سعر الشراء *</label><input type="number" step="0.01" id="prodPurchasePrice" required></div>
                     <div style="flex: 1;"><label>سعر البيع *</label><input type="number" step="0.01" id="prodSalePrice" required></div>
                 </div>
                 <div class="form-group" style="display: flex; gap: 10px;">
-                    <div style="flex: 1;"><label>الكمية الحالية *</label><input type="number" id="prodQuantity" required></div>
-                    <div style="flex: 1;"><label>الحد الأدنى للمخزون</label><input type="number" id="prodMinStock" value="5"></div>
+                    <div style="flex: 1;"><label>الكمية *</label><input type="number" id="prodQuantity" required></div>
+                    <div style="flex: 1;"><label>الحد الأدنى</label><input type="number" id="prodMinStock" value="5"></div>
                 </div>
-                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;"><i class="fa-solid fa-save"></i> حفظ المنتج</button>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">حفظ المنتج</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: مبيعات -->
+    <div class="modal-overlay" id="saleModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>تسجيل عملية بيع جديدة</h3><i class="fa-solid fa-xmark close-modal" onclick="closeModal('saleModal')"></i></div>
+            <form id="saleForm" onsubmit="handleSaleSubmit(event)">
+                <div class="form-group"><label>اختر العميل *</label><select id="saleCustomerSelect" required><option value="">اختر العميل...</option></select></div>
+                <div class="form-group"><label>اختر المنتج *</label><select id="saleProductSelect" required onchange="updateSalePrice()"><option value="">اختر المنتج...</option></select></div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;"><label>الكمية *</label><input type="number" id="saleQuantity" value="1" min="1" required></div>
+                    <div style="flex: 1;"><label>السعر للقطعة</label><input type="number" step="0.01" id="salePrice" required></div>
+                </div>
+                <div class="form-group"><label>الخصم</label><input type="number" step="0.01" id="saleDiscount" value="0"></div>
+                <div class="form-group"><label>طريقة الدفع</label><select id="salePaymentMethod"><option value="نقدي">نقدي</option><option value="بطاقة">بطاقة</option><option value="تحويل">تحويل</option></select></div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">حفظ وتحديث المخزون</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: مصروف -->
+    <div class="modal-overlay" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>تسجيل مصروف جديد</h3><i class="fa-solid fa-xmark close-modal" onclick="closeModal('expenseModal')"></i></div>
+            <form id="expenseForm" onsubmit="handleExpenseSubmit(event)">
+                <div class="form-group"><label>نوع المصروف *</label><select id="expType"><option value="إيجار">إيجار</option><option value="كهرباء">كهرباء</option><option value="إنترنت">إنترنت</option><option value="رواتب">رواتب</option><option value="شحن">شحن</option><option value="تسويق">تسويق</option><option value="أخرى">أخرى</option></select></div>
+                <div class="form-group"><label>المبلغ *</label><input type="number" step="0.01" id="expAmount" required></div>
+                <div class="form-group"><label>الوصف</label><input type="text" id="expDescription"></div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">حفظ المصروف</button>
             </form>
         </div>
     </div>
@@ -289,8 +343,10 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8PCAM1EhouqMcdW6ayzvdp6SwNJjiwukX5Xbk0uBgdnOA_ba4MxfCOV0tybg7C4lb/exec";
+        let globalProducts = [];
+        let globalCustomers = [];
+        let globalSettings = { storeName: "MiniBM", currency: "ج.م" };
 
-        // Navigation
         const navLinks = document.querySelectorAll('.nav-links a');
         const pageSections = document.querySelectorAll('.page-section');
 
@@ -301,8 +357,14 @@
                 this.classList.add('active');
                 const targetId = this.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
+                
                 if(targetId === 'customers-section') loadCustomers();
                 if(targetId === 'products-section') loadProducts();
+                if(targetId === 'sales-section') loadSales();
+                if(targetId === 'expenses-section') loadExpenses();
+                if(targetId === 'reports-section') loadReports();
+                if(targetId === 'settings-section') loadSettingsUI();
+
                 if(window.innerWidth <= 768) sidebar.classList.remove('active');
             });
         });
@@ -334,34 +396,54 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.add('active'); 
+            if(id === 'saleModal') loadDropdownsForSale();
+        }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // --- جلب وحفظ العملاء ---
+        async function initApp() {
+            await loadSettings();
+            loadCustomers();
+            loadProducts();
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getSettings`);
+                const data = await res.json();
+                if(data && Object.keys(data).length > 0) {
+                    globalSettings.storeName = data.storeName || "MiniBM";
+                    globalSettings.currency = data.currency || "ج.م";
+                }
+                document.getElementById('storeBrandName').innerText = globalSettings.storeName;
+                document.querySelectorAll('.currency-label').forEach(el => el.innerText = globalSettings.currency);
+            } catch(e) {}
+        }
+
         async function loadCustomers() {
-            showLoader();
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getCustomers`);
-                const data = await res.json();
+                globalCustomers = await res.json();
                 const tbody = document.getElementById('customersTableBody');
                 tbody.innerHTML = '';
-                if(data.length === 0) {
+                if(!Array.isArray(globalCustomers) || globalCustomers.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا يوجد عملاء مضافون بعد</td></tr>`;
                 } else {
-                    data.forEach(c => {
+                    globalCustomers.forEach(c => {
                         tbody.innerHTML += `<tr>
                             <td><code>${c.CustomerID}</code></td>
                             <td>${c.Name}</td>
                             <td>${c.Phone}</td>
                             <td>${c.Address || '-'}</td>
-                            <td style="color: var(--success); font-weight: bold;">${c.TotalPurchases || 0} ج.م</td>
+                            <td style="color: var(--success); font-weight: bold;">${c.TotalPurchases || 0} ${globalSettings.currency}</td>
                         </tr>`;
                     });
                 }
-                document.getElementById('dashCustCount').innerText = data.length;
+                document.getElementById('dashCustCount').innerText = globalCustomers.length;
             } catch (err) {
                 showToast("فشل تحميل العملاء", "error");
-            } finally { hideLoader(); }
+            }
         }
 
         async function handleCustomerSubmit(e) {
@@ -387,32 +469,30 @@
             } finally { hideLoader(); }
         }
 
-        // --- جلب وحفظ المنتجات (المشكلة التي تم حلها) ---
         async function loadProducts() {
-            showLoader();
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getProducts`);
-                const data = await res.json();
+                globalProducts = await res.json();
                 const tbody = document.getElementById('productsTableBody');
                 tbody.innerHTML = '';
-                if(data.length === 0) {
+                if(!Array.isArray(globalProducts) || globalProducts.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد منتجات مضافة بعد</td></tr>`;
                 } else {
-                    data.forEach(p => {
+                    globalProducts.forEach(p => {
                         tbody.innerHTML += `<tr>
                             <td><code>${p.ProductID}</code></td>
                             <td>${p.Name}</td>
                             <td>${p.Category}</td>
-                            <td>${p.PurchasePrice} ج.م</td>
-                            <td>${p.SalePrice} ج.م</td>
+                            <td>${p.PurchasePrice} ${globalSettings.currency}</td>
+                            <td>${p.SalePrice} ${globalSettings.currency}</td>
                             <td style="font-weight: bold; color: ${p.Quantity <= p.MinStock ? 'var(--danger)' : 'var(--success)'}">${p.Quantity}</td>
                         </tr>`;
                     });
                 }
-                document.getElementById('dashProdCount').innerText = data.length;
+                document.getElementById('dashProdCount').innerText = globalProducts.length;
             } catch (err) {
                 showToast("فشل تحميل المنتجات", "error");
-            } finally { hideLoader(); }
+            }
         }
 
         async function handleProductSubmit(e) {
@@ -440,25 +520,183 @@
             } finally { hideLoader(); }
         }
 
-        async function testAPIConnection() {
+        async function loadSales() {
             showLoader();
-            const resultDiv = document.getElementById('apiResult');
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=test`);
-                const data = await response.json();
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = JSON.stringify(data, null, 2);
-                showToast("الاتصال يعمل بكفاءة!", "success");
-            } catch (error) {
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<span style="color: var(--danger);">خطأ في الاتصال بالخادم.</span>`;
-                showToast("فشل الاتصال", "error");
+                const res = await fetch(`${SCRIPT_URL}?action=getSales`);
+                const data = await res.json();
+                const tbody = document.getElementById('salesTableBody');
+                tbody.innerHTML = '';
+                let totalSalesSum = 0;
+                if(!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا توجد مبيعات مسجلة بعد</td></tr>`;
+                } else {
+                    data.forEach(s => {
+                        totalSalesSum += Number(s.Total) || 0;
+                        tbody.innerHTML += `<tr>
+                            <td><code>${s.SaleID}</code></td>
+                            <td>${s.CustomerID}</td>
+                            <td>${new Date(s.Date).toLocaleDateString('ar-EG')}</td>
+                            <td style="color: var(--success); font-weight: bold;">${s.Total} ${globalSettings.currency}</td>
+                            <td>${s.PaymentMethod}</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('dashTotalSales').innerHTML = `${totalSalesSum} <span class="currency-label">${globalSettings.currency}</span>`;
+            } catch(e) {
+                showToast("فشل تحميل المبيعات", "error");
             } finally { hideLoader(); }
         }
 
-        // التحميل الأولي عند فتح الصفحة
-        loadCustomers();
-        loadProducts();
+        function loadDropdownsForSale() {
+            const custSelect = document.getElementById('saleCustomerSelect');
+            custSelect.innerHTML = '<option value="">اختر العميل...</option>';
+            globalCustomers.forEach(c => {
+                custSelect.innerHTML += `<option value="${c.CustomerID}">${c.Name} (${c.Phone})</option>`;
+            });
+
+            const prodSelect = document.getElementById('saleProductSelect');
+            prodSelect.innerHTML = '<option value="">اختر المنتج...</option>';
+            globalProducts.forEach(p => {
+                prodSelect.innerHTML += `<option value="${p.ProductID}" data-price="${p.SalePrice}">${p.Name} (المخزون: ${p.Quantity})</option>`;
+            });
+        }
+
+        function updateSalePrice() {
+            const prodSelect = document.getElementById('saleProductSelect');
+            const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
+            const price = selectedOpt.getAttribute('data-price') || 0;
+            document.getElementById('salePrice').value = price;
+        }
+
+        async function handleSaleSubmit(e) {
+            e.preventDefault();
+            showLoader();
+            const payload = {
+                action: "createSale",
+                customerID: document.getElementById('saleCustomerSelect').value,
+                paymentMethod: document.getElementById('salePaymentMethod').value,
+                discount: parseFloat(document.getElementById('saleDiscount').value) || 0,
+                items: [{
+                    productID: document.getElementById('saleProductSelect').value,
+                    quantity: parseInt(document.getElementById('saleQuantity').value),
+                    price: parseFloat(document.getElementById('salePrice').value)
+                }]
+            };
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if(result.status === 'success') {
+                    showToast(result.message, 'success');
+                    closeModal('saleModal');
+                    loadSales();
+                    loadProducts();
+                } else { throw new Error(result.message); }
+            } catch(err) {
+                showToast("حدث خطأ أثناء إتمام البيع", "error");
+            } finally { hideLoader(); }
+        }
+
+        async function loadExpenses() {
+            showLoader();
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getExpenses`);
+                const data = await res.json();
+                const tbody = document.getElementById('expensesTableBody');
+                tbody.innerHTML = '';
+                let totalExp = 0;
+                if(!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا توجد مصروفات مسجلة بعد</td></tr>`;
+                } else {
+                    data.forEach(ex => {
+                        totalExp += Number(ex.Amount) || 0;
+                        tbody.innerHTML += `<tr>
+                            <td><code>${ex.ExpenseID}</code></td>
+                            <td>${ex.Type}</td>
+                            <td style="color: var(--danger); font-weight: bold;">${ex.Amount} ${globalSettings.currency}</td>
+                            <td>${new Date(ex.Date).toLocaleDateString('ar-EG')}</td>
+                            <td>${ex.Description || '-'}</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('dashTotalExpenses').innerHTML = `${totalExp} <span class="currency-label">${globalSettings.currency}</span>`;
+            } catch(e) {
+                showToast("فشل تحميل المصروفات", "error");
+            } finally { hideLoader(); }
+        }
+
+        async function handleExpenseSubmit(e) {
+            e.preventDefault();
+            showLoader();
+            const payload = {
+                action: "addExpense",
+                type: document.getElementById('expType').value,
+                amount: parseFloat(document.getElementById('expAmount').value),
+                description: document.getElementById('expDescription').value
+            };
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if(result.status === 'success') {
+                    showToast(result.message, 'success');
+                    closeModal('expenseModal');
+                    loadExpenses();
+                } else { throw new Error(result.message); }
+            } catch(err) {
+                showToast("حدث خطأ أثناء تسجيل المصروف", "error");
+            } finally { hideLoader(); }
+        }
+
+        async function loadReports() {
+            // جلب البيانات لعرض ملخص الأرباح
+            try {
+                const salesRes = await fetch(`${SCRIPT_URL}?action=getSales`);
+                const salesData = await salesRes.json();
+                let totalRev = 0;
+                if(Array.isArray(salesData)) {
+                    salesData.forEach(s => totalRev += Number(s.Total) || 0);
+                }
+
+                const expRes = await fetch(`${SCRIPT_URL}?action=getExpenses`);
+                const expData = await expRes.json();
+                let totalExp = 0;
+                if(Array.isArray(expData)) {
+                    expData.forEach(e => totalExp += Number(e.Amount) || 0);
+                }
+
+                document.getElementById('reportTotalRevenue').innerHTML = `${totalRev} <span class="currency-label">${globalSettings.currency}</span>`;
+                document.getElementById('reportTotalExpenses').innerHTML = `${totalExp} <span class="currency-label">${globalSettings.currency}</span>`;
+                document.getElementById('reportNetProfit').innerHTML = `${totalRev - totalExp} <span class="currency-label">${globalSettings.currency}</span>`;
+            } catch(e) {}
+        }
+
+        function loadSettingsUI() {
+            document.getElementById('settingStoreName').value = globalSettings.storeName;
+            document.getElementById('settingCurrency').value = globalSettings.currency;
+        }
+
+        async function handleSettingsSubmit(e) {
+            e.preventDefault();
+            showLoader();
+            const newName = document.getElementById('settingStoreName').value;
+            const newCurr = document.getElementById('settingCurrency').value;
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "saveSetting", key: "storeName", value: newName }) });
+                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "saveSetting", key: "currency", value: newCurr }) });
+                
+                globalSettings.storeName = newName;
+                globalSettings.currency = newCurr;
+                document.getElementById('storeBrandName').innerText = newName;
+                document.querySelectorAll('.currency-label').forEach(el => el.innerText = newCurr);
+                
+                showToast("تم حفظ إعدادات المتجر بنجاح", "success");
+            } catch(e) {
+                showToast("فشل حفظ الإعدادات", "error");
+            } finally { hideLoader(); }
+        }
+
+        // التهيئة الأولية للموقع عند الفتح
+        initApp();
     </script>
 </body>
 </html>
