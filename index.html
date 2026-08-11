@@ -60,7 +60,6 @@
         .card-info h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; }
         .card-info h2 { font-size: 24px; color: var(--text-main); }
         .card-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .icon-blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
         .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
         .icon-red { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
         .icon-yellow { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
@@ -332,7 +331,7 @@
             toast.className = `toast ${type}`;
             toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation'}"></i> <span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
         function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -388,20 +387,33 @@
             showLoader();
             const name = encodeURIComponent(document.getElementById('custName').value);
             const phone = encodeURIComponent(document.getElementById('custPhone').value);
-            const email = encodeURIComponent(document.getElementById('custEmail').value);
-            const address = encodeURIComponent(document.getElementById('custAddress').value);
+            const email = encodeURIComponent(document.getElementById('custEmail').value || '');
+            const address = encodeURIComponent(document.getElementById('custAddress').value || '');
 
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=addCustomer&name=${name}&phone=${phone}&email=${email}&address=${address}`);
-                const result = await res.json();
+                const targetUrl = `${SCRIPT_URL}?action=addCustomer&name=${name}&phone=${phone}&email=${email}&address=${address}`;
+                const res = await fetch(targetUrl);
+                const textRes = await res.text();
+                
+                let result;
+                try {
+                    result = JSON.parse(textRes);
+                } catch(parseErr) {
+                    throw new Error("استجابة غير صالحة من السيرفر: " + textRes);
+                }
+
                 if(result.status === 'success') {
                     showToast(result.message, 'success');
                     closeModal('customerModal');
                     loadCustomers();
-                } else { throw new Error(result.message); }
+                } else { 
+                    throw new Error(result.message || "خطأ غير معروف"); 
+                }
             } catch (err) {
-                showToast("حدث خطأ أثناء الحفظ", "error");
-            } finally { hideLoader(); }
+                showToast("خطأ: " + err.message, "error");
+            } finally { 
+                hideLoader(); 
+            }
         }
 
         async function loadProducts() {
@@ -434,22 +446,25 @@
             e.preventDefault();
             showLoader();
             const name = encodeURIComponent(document.getElementById('prodName').value);
-            const category = encodeURIComponent(document.getElementById('prodCategory').value);
+            const category = encodeURIComponent(document.getElementById('prodCategory').value || '');
             const purchasePrice = document.getElementById('prodPurchasePrice').value;
             const salePrice = document.getElementById('prodSalePrice').value;
             const quantity = document.getElementById('prodQuantity').value;
             const minStock = document.getElementById('prodMinStock').value;
 
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=addProduct&name=${name}&category=${category}&purchasePrice=${purchasePrice}&salePrice=${salePrice}&quantity=${quantity}&minStock=${minStock}`);
-                const result = await res.json();
+                const targetUrl = `${SCRIPT_URL}?action=addProduct&name=${name}&category=${category}&purchasePrice=${purchasePrice}&salePrice=${salePrice}&quantity=${quantity}&minStock=${minStock}`;
+                const res = await fetch(targetUrl);
+                const textRes = await res.text();
+                let result = JSON.parse(textRes);
+                
                 if(result.status === 'success') {
                     showToast(result.message, 'success');
                     closeModal('productModal');
                     loadProducts();
                 } else { throw new Error(result.message); }
             } catch (err) {
-                showToast("حدث خطأ أثناء حفظ المنتج", "error");
+                showToast("خطأ المنتج: " + err.message, "error");
             } finally { hideLoader(); }
         }
 
@@ -483,18 +498,21 @@
             showLoader();
             const type = encodeURIComponent(document.getElementById('expType').value);
             const amount = document.getElementById('expAmount').value;
-            const description = encodeURIComponent(document.getElementById('expDescription').value);
+            const description = encodeURIComponent(document.getElementById('expDescription').value || '');
 
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=addExpense&type=${type}&amount=${amount}&description=${description}`);
-                const result = await res.json();
+                const targetUrl = `${SCRIPT_URL}?action=addExpense&type=${type}&amount=${amount}&description=${description}`;
+                const res = await fetch(targetUrl);
+                const textRes = await res.text();
+                let result = JSON.parse(textRes);
+                
                 if(result.status === 'success') {
                     showToast(result.message, 'success');
                     closeModal('expenseModal');
                     loadExpenses();
                 } else { throw new Error(result.message); }
             } catch(err) {
-                showToast("حدث خطأ أثناء تسجيل المصروف", "error");
+                showToast("خطأ المصروف: " + err.message, "error");
             } finally { hideLoader(); }
         }
 
